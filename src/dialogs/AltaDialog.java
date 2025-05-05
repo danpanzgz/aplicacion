@@ -18,6 +18,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import dao.GestionTrabajadores;
+import exceptions.BDException;
 import modelo.Empresa;
 import modelo.Trabajador;
 
@@ -72,11 +74,9 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	public AltaDialog(Empresa empresa) {
 		this.empresa = empresa;
 		setResizable(false);
-		// t�tulo del di�log
 		setTitle("Alta Trabajador");
 		setSize(300, 350);
 		setLayout(new FlowLayout());
-
 		setLocationRelativeTo(null);
 
 		// una fila por JPanel
@@ -178,23 +178,31 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == aceptar) {
+			
 			try {
-
 				id = Integer.parseInt(areaIdentificador.getText());
 				dni = areaDni.getText();
 				nombre = areaNombre.getText();
 				apellidos = areaApellidos.getText();
 				direccion = areaDireccion.getText();
 				telefono = areaTelefono.getText();
+	            puesto = comboPuesto.getSelectedItem().toString();
+
+				
 				if (comprobarErrores()) {
 					Trabajador t = new Trabajador(id, dni, nombre, apellidos, direccion, telefono, puesto);
-					if (empresa.altaTrabajador(t)) {
-						JOptionPane.showMessageDialog(null, "Datos introducidos correctamente");
-					} else {
-						JOptionPane.showMessageDialog(null, "El ID del trabajador que quiere introducir ya existe",
-								"Error", JOptionPane.ERROR_MESSAGE);
+					
+					try {
+						if (GestionTrabajadores.altaTrabajador(t)) {
+							JOptionPane.showMessageDialog(null, "Datos introducidos correctamente");
+							dispose();
+						} else {
+							JOptionPane.showMessageDialog(null, "El ID del trabajador que quiere introducir ya existe","Error", JOptionPane.ERROR_MESSAGE);
+						}
+					} catch (BDException ex) {
+							JOptionPane.showMessageDialog(null, "Error al insertar en BD" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						}
 					}
-				}
 
 			} catch (Exception e1) {
 				JOptionPane.showMessageDialog(null, "El ID debe ser un n�mero entero", "Error",
@@ -218,8 +226,8 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 			JOptionPane.showMessageDialog(null, "El ID debe ser un n�mero entero positivo", "Error",
 					JOptionPane.ERROR_MESSAGE);
 			return false;
-		} else if (dni.equals("") || dni.length() != 9) {
-			JOptionPane.showMessageDialog(null, "El DNI debe tener longitud 9", "Error", JOptionPane.ERROR_MESSAGE);
+		} else if (!GestionTrabajadores.validarDNI(dni)) {
+			JOptionPane.showMessageDialog(null, "El DNI no es valido", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		} else if (nombre.equals("")) {
 			JOptionPane.showMessageDialog(null, "Debe introducir el nombre del trabajador", "Error",

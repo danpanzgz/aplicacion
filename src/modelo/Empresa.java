@@ -1,133 +1,75 @@
-/**
- * 
- */
 package modelo;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/**
- * @author alumno
- *
- */
+import dao.GestionTrabajadores;
+import exceptions.BDException;
+
 public class Empresa {
-	
-	ArrayList <Trabajador> trabajadores;
-	
+
+	private ArrayList<Trabajador> trabajadores;
+
+	public Empresa() {
+		// No se necesita lista interna
+
+	}
 
 	/**
-	 * @param trabajadores
+	 * Da de alta un trabajador en la base de datos.
+	 * 
+	 * @param t El trabajador a insertar.
+	 * @return true si se insertó correctamente, false si ya existe el ID.
+	 * @throws BDException si hay un error de base de datos.
 	 */
+	public boolean altaTrabajador(Trabajador t) throws BDException {
+		return GestionTrabajadores.altaTrabajador(t);
+	}
+
+	/**
+	 * Da de baja un trabajador por su ID.
+	 * 
+	 * @param codigo ID del trabajador a eliminar.
+	 * @return true si fue eliminado correctamente, false si no se encontró.
+	 * @throws BDException si hay un error de base de datos.
+	 */
+	public boolean bajaTrabajador(int id) throws BDException {
+	    boolean eliminado = GestionTrabajadores.bajaTrabajador(id); // Llamamos a la eliminación en la base de datos
+	    if (eliminado) {
+	        // Actualizamos la lista de trabajadores después de la eliminación
+	        trabajadores.removeIf(trabajador -> trabajador.getIdentificador() == id);
+	    }
+	    return eliminado;
+	}
+
+	/**
+	 * Devuelve una matriz con todos los trabajadores para mostrar en tabla.
+	 * 
+	 * @return matriz de Strings con los datos de los trabajadores.
+	 * @throws BDException si ocurre un error al consultar.
+	 */
+	public String[][] listarTrabajadores() throws BDException {
+		return GestionTrabajadores.listarTrabajadores();
+	}
+
+	/**
+	 * Valida si un DNI es correcto.
+	 * 
+	 * @param dni El DNI a comprobar.
+	 * @return true si es válido, false en caso contrario.
+	 */
+	public boolean validarDNI(String dni) {
+		return GestionTrabajadores.validarDNI(dni);
+	}
+
 	public Empresa(ArrayList<Trabajador> trabajadores) {
 		this.trabajadores = trabajadores;
 	}
-	
-	/**
-	 * Comprueba si un trabajador est� en la lista
-	 * @param t
-	 * @return
-	 */
-	public boolean esta(Trabajador t){
-		for(int i=0; i<trabajadores.size(); i++){
-			if(trabajadores.get(i).getIdentificador() == t.getIdentificador()){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Devuelve la posici�n en la que se encuentra un trabajador
-	 * busc�ndolo por dni
-	 * @param t
-	 * @return
-	 */
-	public int devolverPosicion(int codigo){
-		for(int i=0; i<trabajadores.size(); i++){
-			if (trabajadores.get(i).getIdentificador() == codigo){
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	/**
-	 * Si el trabajador no est� en la lista, lo a�ade
-	 * @param t
-	 */
-	public boolean altaTrabajador(Trabajador t){
-		if(!esta(t)){
-			trabajadores.add(t);
-			return true;
-		}
-		else return false;
-	}
-	/**
-	 * Da de baja un trabajador busc�ndolo por c�digo
-	 * @param t
-	 */
-	public boolean bajaTrabajador(int codigo){
-		int posicion = devolverPosicion(codigo);
-		if(posicion > -1){
-			trabajadores.remove(posicion);
-			return true;
-		}
-		else return false;
-	}
-	/**
-	 * Devuelve un trabajador
-	 * @param dni
-	 * @return
-	 */
-	public Trabajador buscarTrabajador(int codigo){		
-		for(int i=0; i<trabajadores.size(); i++){
-			if(trabajadores.get(i).getIdentificador() == codigo){
-				return( trabajadores.get(i)); 
-			}
-		}
-		return null;
-	}
-	/**
-	 * Permite modificar el valor de los atributos de un objeto Trabajador
-	 * @param dni
-	 * @return
-	 */
-	public void modificarTrabajador(int codigo, String dni, String nombre, String apellidos, String direccion, String telefono, String puesto){
-		int posicion = devolverPosicion(codigo);
-		trabajadores.get(posicion).setDni(dni);
-		trabajadores.get(posicion).setNombre(nombre);
-		trabajadores.get(posicion).setApellidos(apellidos);
-		trabajadores.get(posicion).setDireccion(direccion);
-		trabajadores.get(posicion).setTelefono(telefono);
-		trabajadores.get(posicion).setPuesto(puesto);
-	}
-	
-	/**
-	 * Devuelve una matriz que se utilizar� para listar los trabajadores
-	 * @return
-	 */
-	public String[][] listarTrabajadores(){
-		String [][] datos = new String[trabajadores.size()][7];
-		for (int i=0; i<trabajadores.size(); i++){
-			String[] fila = new String [7];
-			
-			fila[0] = Integer.toString(trabajadores.get(i).getIdentificador());
-			fila[1] = trabajadores.get(i).getDni();
-			fila[2] = trabajadores.get(i).getNombre();
-			fila[3] = trabajadores.get(i).getApellidos();
-			fila[4] = trabajadores.get(i).getDireccion();
-			fila[5] = trabajadores.get(i).getTelefono();
-			fila[6] = trabajadores.get(i).getPuesto();
-			
-			datos[i] = fila;
-		}
-		return datos;
-	}
 
 	public ArrayList<Trabajador> getTrabajadores() {
+		if (trabajadores == null) {
+			trabajadores = new ArrayList<>();
+		}
 		return trabajadores;
-	}
-
-	public void setTrabajadores(ArrayList<Trabajador> trabajadores) {
-		this.trabajadores = trabajadores;
 	}
 }

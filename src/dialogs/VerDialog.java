@@ -37,7 +37,7 @@ public class VerDialog extends JDialog implements ActionListener {
 
         // Opción 2: Buscar desde lista desplegable de trabajadores
         add(new JLabel("O seleccione un trabajador:"));
-        trabajadorComboBox = new JComboBox<>(empresa.getIdentificadoresTrabajadores());
+        trabajadorComboBox = new JComboBox<>(empresa.getIdentificador());
         trabajadorComboBox.addActionListener(this);
         add(trabajadorComboBox);
 
@@ -93,7 +93,7 @@ public class VerDialog extends JDialog implements ActionListener {
     // Mostrar los datos del trabajador en el JTextArea
     private void mostrarDatos(Trabajador trabajador) {
         StringBuilder datos = new StringBuilder();
-        datos.append("Código: " + trabajador.getId() + "\n");
+        datos.append("Código: " + trabajador.getIdentificador() + "\n");
         datos.append("DNI: " + trabajador.getDni() + "\n");
         datos.append("Nombre: " + trabajador.getNombre() + "\n");
         datos.append("Apellidos: " + trabajador.getApellidos() + "\n");

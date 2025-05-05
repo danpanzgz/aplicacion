@@ -13,6 +13,9 @@ import javax.swing.JFrame;
 import dialogs.AltaDialog;
 import dialogs.BajaDialog;
 import dialogs.ListarDialog;
+import dialogs.ModificaDialog;
+import dialogs.VerDialog;
+import exceptions.BDException;
 import ficheros.FicheroDatos;
 import modelo.Empresa;
 import modelo.Trabajador;
@@ -36,9 +39,7 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 	public EmpresaGUI() {
 		super("Gestión de personal");
 
-		// Carga los trabajadores leidos de un fichero a memoria
-		ArrayList<Trabajador> trabaj = FicheroDatos.obtenerTrabajadores("ficheroDatos\\empresa.dat");
-		empresa = new Empresa(trabaj);
+		empresa = new Empresa();
 
 		// Tamaño JFrame
 		setSize(800, 750);
@@ -90,13 +91,24 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 		if (e.getSource() == altaTrabajador) {
 			new AltaDialog(empresa);
 		} else if (e.getSource() == bajaTrabajador) {
-			new BajaDialog(empresa);
+			try {
+				new BajaDialog(empresa);
+			} catch (BDException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (e.getSource() == modificaTrabajador) {
-			new ModificaDialog(empresa);
+	//		new ModificaDialog(empresa);
 		} else if (e.getSource() == buscaTrabajador) {
 			new VerDialog(empresa);
 		} else if (e.getSource() == listarTrabajadores) {
-			new ListarDialog(empresa);
+			try {
+				new ListarDialog(empresa);
+			} catch (BDException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		
 		}
 		// Cuando se sale se vuelca a fichero.
 		else if (e.getSource() == salir) {

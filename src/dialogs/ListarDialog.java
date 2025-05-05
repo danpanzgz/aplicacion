@@ -14,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import exceptions.BDException;
 import modelo.Empresa;
 
 /**
@@ -27,7 +28,7 @@ public class ListarDialog extends JDialog implements ActionListener {
 	JTable tabla;
 	JButton cerrar;
 
-	public ListarDialog(Empresa empresa) {
+	public ListarDialog(Empresa empresa) throws BDException {
 		this.empresa = empresa;
 
 		setResizable(false);
