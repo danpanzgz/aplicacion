@@ -56,7 +56,7 @@ public class BajaDialog extends JDialog implements ActionListener {
 	
 	 private void cargarTabla() throws BDException{
 	    	// Crea un JTable, cada fila será un trabajador
-	    			String[] columnas = { "Identificador", "DNI", "Nombre", "Apellidos", "Direcci�n", "Tel�fono", "Puesto" };
+		 			String[] columnas = { "Identificador", "DNI", "Nombre", "Apellidos", "Dirección", "Teléfono", "Puesto" };
 	    			String[][] datos = GestionTrabajadores.listarTrabajadores();
 	    			
 	    			if (tabla != null) {
@@ -68,6 +68,9 @@ public class BajaDialog extends JDialog implements ActionListener {
 	    			JScrollPane jsp = new JScrollPane(tabla);
 	    			jsp.setPreferredSize(new Dimension(700, 600));
 	    			add(jsp);
+	    			
+	    			revalidate();
+	    			repaint();
 
 	    }
 
@@ -86,7 +89,7 @@ public class BajaDialog extends JDialog implements ActionListener {
 			}
 			
 			try {
-				int id = Integer.parseInt((String) tabla.getValueAt(filaSeleccionada, 0).toString());
+				int id = Integer.parseInt(tabla.getValueAt(filaSeleccionada, 0).toString());
 				
 				int confirmacion = JOptionPane.showConfirmDialog(this, 
 						"Estas seguro de dar de baja el trabajador con el id " + id + " ?", "Confirmar baja", JOptionPane.YES_NO_OPTION);

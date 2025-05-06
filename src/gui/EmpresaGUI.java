@@ -98,7 +98,12 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 				e1.printStackTrace();
 			}
 		} else if (e.getSource() == modificaTrabajador) {
-	//		new ModificaDialog(empresa);
+			try {
+				new ModificaDialog(empresa);
+			} catch (BDException e1) { 
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else if (e.getSource() == buscaTrabajador) {
 			new VerDialog(empresa);
 		} else if (e.getSource() == listarTrabajadores) {

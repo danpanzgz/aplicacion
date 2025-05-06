@@ -50,6 +50,27 @@ public class GestionTrabajadores {
 		}
 	}
 	
+	public static boolean modificaTrabajador(Trabajador t) throws BDException {
+	    String sql = "UPDATE empleados SET dni=?, nombre=?, apellido=?, direccion=?, telefono=?, puesto=? WHERE id=?";
+	    
+	    try (Connection conn = ConfigSQLite.abrirConexion(); 
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	        pstmt.setString(1, t.getDni());
+	        pstmt.setString(2, t.getNombre());
+	        pstmt.setString(3, t.getApellidos());
+	        pstmt.setString(4, t.getDireccion());
+	        pstmt.setString(5, t.getTelefono());
+	        pstmt.setString(6, t.getPuesto());
+	        pstmt.setInt(7, t.getIdentificador());
+
+	        int filas = pstmt.executeUpdate();
+	        return filas > 0;
+	    } catch (SQLException e) {
+	        throw new BDException("Error al actualizar trabajador: " + e.getMessage());
+	    }
+	}
+	
 	public static String[][] listarTrabajadores() throws BDException {
 	    List<String[]> lista = new ArrayList<>();
 	    String sql = "SELECT * FROM empleados";
