@@ -1,106 +1,119 @@
 package dialogs;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.regex.*;
+
+import dao.GestionTrabajadores;
+import exceptions.BDException;
 import modelo.Empresa;
-import modelo.Trabajador;
 
 public class VerDialog extends JDialog implements ActionListener {
 
     private Empresa empresa;
-    private JTextField codigoField;
-    private JButton buscarButton, cancelarButton;
-    private JTextArea resultadoArea;
-    private JComboBox<String> trabajadorComboBox;
+    private JTable tabla;
+    private TableRowSorter<TableModel> sorter;
+    private JTextField filtroNombre, filtroDNI;
+    private JButton cerrar, limpiarFiltros;
 
     public VerDialog(Empresa empresa) {
         this.empresa = empresa;
 
-        setTitle("Buscar Trabajador");
-        setSize(400, 300);
-        setResizable(false);
-        setLocationRelativeTo(null); // Centra la ventana
+        setTitle("Buscar Trabajadores");
+        setSize(800, 700);
+        setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
+        setModal(true);
 
-        setLayout(new FlowLayout());
-
-        // Opción 1: Buscar por código de trabajador
-        add(new JLabel("Introduzca el código del trabajador:"));
-        codigoField = new JTextField(15);
-        add(codigoField);
-
-        buscarButton = new JButton("Buscar");
-        buscarButton.addActionListener(this);
-        add(buscarButton);
-
-        // Opción 2: Buscar desde lista desplegable de trabajadores
-        add(new JLabel("O seleccione un trabajador:"));
-        trabajadorComboBox = new JComboBox<>(empresa.getIdentificador());
-        trabajadorComboBox.addActionListener(this);
-        add(trabajadorComboBox);
-
-        // Área para mostrar el resultado de la búsqueda
-        resultadoArea = new JTextArea(8, 30);
-        resultadoArea.setEditable(false);
-        add(new JScrollPane(resultadoArea));
-
-        // Botón para cancelar
-        cancelarButton = new JButton("Cancelar");
-        cancelarButton.addActionListener(this);
-        add(cancelarButton);
+        try {
+            inicializarTabla();
+            inicializarFiltros();
+            inicializarBotones();
+        } catch (BDException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar los trabajadores", "Error", JOptionPane.ERROR_MESSAGE);
+        }
 
         setVisible(true);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == buscarButton) {
-            // Buscar trabajador por código introducido
-            String codigo = codigoField.getText();
-            try {
-                int codigoInt = Integer.parseInt(codigo);
-                if (codigoInt <= 0) {
-                    throw new NumberFormatException(); // Si es menor o igual a cero, lo consideramos un error
-                }
+    private void inicializarTabla() throws BDException {
+        String[] columnas = { "ID", "DNI", "Nombre", "Apellidos", "Dirección", "Teléfono", "Puesto" };
+        String[][] datos = GestionTrabajadores.listarTrabajadores();
 
-                Trabajador trabajador = empresa.getTrabajadorPorId(String.valueOf(codigoInt));
-                if (trabajador != null) {
-                    mostrarDatos(trabajador);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Trabajador no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingrese un número entero mayor a 0.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
-            }
-        } else if (e.getSource() == trabajadorComboBox) {
-            // Buscar trabajador desde el ComboBox
-            String id = (String) trabajadorComboBox.getSelectedItem();
-            if (id != null) {
-                Trabajador trabajador = empresa.getTrabajadorPorId(id);
-                if (trabajador != null) {
-                    mostrarDatos(trabajador);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Trabajador no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } else if (e.getSource() == cancelarButton) {
-            dispose(); // Cerrar el diálogo si se cancela
+        tabla = new JTable(datos, columnas);
+        sorter = new TableRowSorter<>(tabla.getModel());
+        tabla.setRowSorter(sorter);
+
+        JScrollPane scroll = new JScrollPane(tabla);
+        scroll.setPreferredSize(new Dimension(750, 550));
+        add(scroll, BorderLayout.CENTER);
+    }
+
+    private void inicializarFiltros() {
+        JPanel panelFiltros = new JPanel(new FlowLayout());
+
+        panelFiltros.add(new JLabel("Filtrar por Nombre:"));
+        filtroNombre = new JTextField(10);
+        filtroNombre.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { aplicarFiltro(); }
+            public void removeUpdate(DocumentEvent e) { aplicarFiltro(); }
+            public void changedUpdate(DocumentEvent e) { aplicarFiltro(); }
+        });
+        panelFiltros.add(filtroNombre);
+
+        panelFiltros.add(new JLabel("Filtrar por DNI:"));
+        filtroDNI = new JTextField(10);
+        filtroDNI.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { aplicarFiltro(); }
+            public void removeUpdate(DocumentEvent e) { aplicarFiltro(); }
+            public void changedUpdate(DocumentEvent e) { aplicarFiltro(); }
+        });
+        panelFiltros.add(filtroDNI);
+
+        add(panelFiltros, BorderLayout.NORTH);
+    }
+
+    private void inicializarBotones() {
+        JPanel panelBotones = new JPanel();
+
+        limpiarFiltros = new JButton("Limpiar filtros");
+        limpiarFiltros.addActionListener(this);
+        panelBotones.add(limpiarFiltros);
+
+        cerrar = new JButton("Cerrar");
+        cerrar.addActionListener(this);
+        panelBotones.add(cerrar);
+
+        add(panelBotones, BorderLayout.SOUTH);
+    }
+
+    private void aplicarFiltro() {
+        RowFilter<TableModel, Object> rf = null;
+        try {
+            String nombre = Pattern.quote(filtroNombre.getText());
+            String dni = Pattern.quote(filtroDNI.getText());
+
+            rf = RowFilter.regexFilter("(?i).*" + nombre + ".*", 2); // columna nombre
+            RowFilter<TableModel, Object> rfDNI = RowFilter.regexFilter("(?i).*" + dni + ".*", 1); // columna dni
+
+            sorter.setRowFilter(RowFilter.andFilter(java.util.Arrays.asList(rf, rfDNI)));
+        } catch (PatternSyntaxException e) {
+            System.out.println("Filtro inválido");
         }
     }
 
-    // Mostrar los datos del trabajador en el JTextArea
-    private void mostrarDatos(Trabajador trabajador) {
-        StringBuilder datos = new StringBuilder();
-        datos.append("Código: " + trabajador.getIdentificador() + "\n");
-        datos.append("DNI: " + trabajador.getDni() + "\n");
-        datos.append("Nombre: " + trabajador.getNombre() + "\n");
-        datos.append("Apellidos: " + trabajador.getApellidos() + "\n");
-        datos.append("Dirección: " + trabajador.getDireccion() + "\n");
-        datos.append("Teléfono: " + trabajador.getTelefono() + "\n");
-        datos.append("Puesto: " + trabajador.getPuesto() + "\n");
-
-        resultadoArea.setText(datos.toString()); // Mostrar en el área de texto
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == cerrar) {
+            dispose();
+        } else if (e.getSource() == limpiarFiltros) {
+            filtroNombre.setText("");
+            filtroDNI.setText("");
+            sorter.setRowFilter(null);
+        }
     }
 }

@@ -3,7 +3,6 @@
  */
 package dialogs;
 
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,7 +45,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	JLabel etiquetaTelefono;
 	JTextField areaTelefono;
 	JLabel etiquetaPuesto;
-	JComboBox comboPuesto;
+	JComboBox<String> comboPuesto;
 	JButton aceptar;
 	JButton cancelar;
 	/**
@@ -135,7 +134,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 		etiquetaPuesto = new JLabel("Puesto                         ");
 		pPuesto.add(etiquetaPuesto);
 		// lista desplegable
-		comboPuesto = new JComboBox();
+		comboPuesto = new JComboBox<String>();
 		comboPuesto.addItem("Elija Puesto");
 		comboPuesto.addItem("Programador");
 		comboPuesto.addItem("Analista");

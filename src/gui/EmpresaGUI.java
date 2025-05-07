@@ -2,10 +2,10 @@
 package gui;
 
 import java.awt.GridLayout;
+import javax.swing.UIManager;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,7 +18,6 @@ import dialogs.VerDialog;
 import exceptions.BDException;
 import ficheros.FicheroDatos;
 import modelo.Empresa;
-import modelo.Trabajador;
 
 /**
  * 
@@ -127,6 +126,11 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		 try {
+		        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
 		new EmpresaGUI();
 	}
 

@@ -72,4 +72,22 @@ public class Empresa {
 		}
 		return trabajadores;
 	}
+	
+	public Trabajador buscarTrabajadorPorID(int id) {
+	    for (Trabajador t : trabajadores) {
+	        if (t.getIdentificador() == id) {
+	            return t;
+	        }
+	    }
+	    return null;
+	}
+
+	public Trabajador buscarTrabajadorPorDNI(String dni) {
+	    for (Trabajador t : trabajadores) {
+	        if (t.getDni().equalsIgnoreCase(dni)) {
+	            return t;
+	        }
+	    }
+	    return null;
+	}
 }
