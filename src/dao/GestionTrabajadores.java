@@ -9,8 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
-
 import config.ConfigSQLite;
 import exceptions.BDException;
 import modelo.Empresa;
@@ -209,9 +207,29 @@ public class GestionTrabajadores {
             throw new BDException("Error al listar trabajadores: " + e.getMessage());
         }
 
-        Gson gson = new Gson();
+     // Construir JSON manualmente
+        StringBuilder json = new StringBuilder();
+        json.append("[\n");
+        for (int i = 0; i < listaTrabajadores.size(); i++) {
+            String[] fila = listaTrabajadores.get(i);
+            json.append("  {\n");
+            json.append("    \"id\": ").append(fila[0]).append(",\n");
+            json.append("    \"dni\": \"").append(fila[1]).append("\",\n");
+            json.append("    \"nombre\": \"").append(fila[2]).append("\",\n");
+            json.append("    \"apellido\": \"").append(fila[3]).append("\",\n");
+            json.append("    \"direccion\": \"").append(fila[4]).append("\",\n");
+            json.append("    \"telefono\": \"").append(fila[5]).append("\",\n");
+            json.append("    \"puesto\": \"").append(fila[6]).append("\"\n");
+            json.append("  }");
+            if (i < listaTrabajadores.size() - 1) {
+                json.append(",");
+            }
+            json.append("\n");
+        }
+        json.append("]");
+        
         try (FileWriter writer = new FileWriter(rutaArchivo)) {
-            gson.toJson(lista, writer);
+            writer.write(json.toString());
         } catch (IOException e) {
             throw new BDException("Error al exportar trabajadores a JSON: " + e.getMessage());
         }
