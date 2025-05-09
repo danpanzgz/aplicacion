@@ -222,7 +222,7 @@ public class AltaDialog extends JDialog implements ActionListener, ItemListener 
 	 */
 	public boolean comprobarErrores() {
 		if (id < 1) {
-			JOptionPane.showMessageDialog(null, "El ID debe ser un n�mero entero positivo", "Error",
+			JOptionPane.showMessageDialog(null, "El ID debe ser un numero entero positivo", "Error",
 					JOptionPane.ERROR_MESSAGE);
 			return false;
 		} else if (!GestionTrabajadores.validarDNI(dni)) {

@@ -11,9 +11,10 @@ public class Empresa {
 	private ArrayList<Trabajador> trabajadores;
 
 	public Empresa() {
-		// No se necesita lista interna
+        trabajadores = new ArrayList<>();
 
 	}
+	
 
 	/**
 	 * Da de alta un trabajador en la base de datos.

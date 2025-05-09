@@ -83,10 +83,6 @@ public class EmpresaGUI extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// Para responder a los clicks del usuario en cada botón (ActionEvent)
-		// nuestra clase hace de oyente de eventos por eso implementa ActionListener
-		// e implementa el método actionPerformed() pasando como parámetro un
-		// ActionEvent.
 		if (e.getSource() == altaTrabajador) {
 			new AltaDialog(empresa);
 		} else if (e.getSource() == bajaTrabajador) {
